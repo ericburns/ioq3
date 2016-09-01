@@ -427,6 +427,9 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
 
+    if (ent->item->giType != IT_TEAM)
+        return;
+
 	if (!other->client)
 		return;
 	if (other->health < 1)
@@ -697,6 +700,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		return;
 	}
 
+    /*
 	// powerups don't spawn in for a while
 	if ( ent->item->giType == IT_POWERUP ) {
 		float	respawn;
@@ -708,6 +712,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		ent->think = RespawnItem;
 		return;
 	}
+    */
 
 
 	trap_LinkEntity (ent);
@@ -809,8 +814,9 @@ void ClearRegisteredItems( void ) {
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 
 	// players always start with the base weapon
-	RegisterItem( BG_FindItemForWeapon( WP_MACHINEGUN ) );
+	// RegisterItem( BG_FindItemForWeapon( WP_MACHINEGUN ) );
 	RegisterItem( BG_FindItemForWeapon( WP_GAUNTLET ) );
+    RegisterItem( BG_FindItemForWeapon( WP_RAILGUN ) );
 #ifdef MISSIONPACK
 	if( g_gametype.integer == GT_HARVESTER ) {
 		RegisterItem( BG_FindItem( "Red Cube" ) );
@@ -889,9 +895,14 @@ void G_SpawnItem (gentity_t *ent, gitem_t *item) {
 	G_SpawnFloat( "random", "0", &ent->random );
 	G_SpawnFloat( "wait", "0", &ent->wait );
 
-	RegisterItem( item );
-	if ( G_ItemDisabled(item) )
-		return;
+    if (item->giType == IT_TEAM) {
+        RegisterItem( item );
+        if ( G_ItemDisabled(item) )
+            return;
+    } else {
+        ent->r.svFlags = SVF_NOCLIENT;
+        ent->s.eFlags |= EF_NODRAW;
+    }
 
 	ent->item = item;
 	// some movers spawn on the second frame, so delay item

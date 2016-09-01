@@ -1180,16 +1180,13 @@ void ClientSpawn(gentity_t *ent) {
 
 	client->ps.clientNum = index;
 
-	client->ps.stats[STAT_WEAPONS] = ( 1 << WP_MACHINEGUN );
-	if ( g_gametype.integer == GT_TEAM ) {
-		client->ps.ammo[WP_MACHINEGUN] = 50;
-	} else {
-		client->ps.ammo[WP_MACHINEGUN] = 100;
-	}
-
-	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GAUNTLET );
+	client->ps.stats[STAT_WEAPONS] = ( 1 << WP_GAUNTLET );
 	client->ps.ammo[WP_GAUNTLET] = -1;
+    client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GRAPPLING_HOOK );
 	client->ps.ammo[WP_GRAPPLING_HOOK] = -1;
+
+    client->ps.stats[STAT_WEAPONS] |= (1 << WP_RAILGUN);
+    client->ps.ammo[WP_RAILGUN] = INFINITE;
 
 	// health will count down towards max_health
 	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;
@@ -1225,7 +1222,7 @@ void ClientSpawn(gentity_t *ent) {
 			// select the highest weapon number available, after any spawn given items have fired
 			client->ps.weapon = 1;
 
-			for (i = WP_NUM_WEAPONS - 1 ; i > 0 ; i--) {
+			for (i = WP_NUM_WEAPONS - 2 ; i > 0 ; i--) {
 				if (client->ps.stats[STAT_WEAPONS] & (1 << i)) {
 					client->ps.weapon = i;
 					break;

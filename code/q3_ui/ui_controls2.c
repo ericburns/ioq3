@@ -112,16 +112,17 @@ typedef struct
 #define ID_CHAT3		32
 #define ID_CHAT4		33
 #define ID_TOGGLEMENU	34
+#define ID_WEAPON10     35
 
 // all others
-#define ID_FREELOOK		35
-#define ID_INVERTMOUSE	36
-#define ID_ALWAYSRUN	37
-#define ID_AUTOSWITCH	38
-#define ID_MOUSESPEED	39
-#define ID_JOYENABLE	40
-#define ID_JOYTHRESHOLD	41
-#define ID_SMOOTHMOUSE	42
+#define ID_FREELOOK		36
+#define ID_INVERTMOUSE	37
+#define ID_ALWAYSRUN	38
+#define ID_AUTOSWITCH	39
+#define ID_MOUSESPEED	40
+#define ID_JOYENABLE	41
+#define ID_JOYTHRESHOLD	42
+#define ID_SMOOTHMOUSE	43
 
 #define ANIM_IDLE		0
 #define ANIM_RUN		1
@@ -183,6 +184,7 @@ typedef struct
 	menuaction_s		railgun;
 	menuaction_s		plasma;
 	menuaction_s		bfg;
+    menuaction_s        hook;
 	menuaction_s		attack;
 	menuaction_s		prevweapon;
 	menuaction_s		nextweapon;
@@ -264,6 +266,7 @@ static bind_t g_bindings[] =
 	{"messagemode3", 	"chat - target",	ID_CHAT3,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"chat - attacker",	ID_CHAT4,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"togglemenu", 		"toggle menu",		ID_TOGGLEMENU,	ANIM_IDLE,		K_ESCAPE,		-1,		-1, -1},
+    {"weapon 10",       "grappling hook",   ID_WEAPON10,    ANIM_WEAPON10,  '0',            -1,     -1, -1},
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
 
@@ -310,6 +313,7 @@ static menucommon_s *g_weapons_controls[] = {
 	(menucommon_s *)&s_controls.railgun,          
 	(menucommon_s *)&s_controls.plasma,           
 	(menucommon_s *)&s_controls.bfg,              
+    (menucommon_s *)&s_controls.hook,
 	NULL,
 };
 
@@ -1395,6 +1399,12 @@ static void Controls_MenuInit( void )
 	s_controls.bfg.generic.callback  = Controls_ActionEvent;
 	s_controls.bfg.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.bfg.generic.id        = ID_WEAPON9;
+
+    s_controls.hook.generic.type        = MTYPE_ACTION;
+    s_controls.hook.generic.flags       = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+    s_controls.hook.generic.callback    = Controls_ActionEvent;
+    s_controls.hook.generic.ownerdraw     = Controls_DrawKeyBinding;
+    s_controls.hook.generic.id          = ID_WEAPON10;
 
 	s_controls.attack.generic.type	    = MTYPE_ACTION;
 	s_controls.attack.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
