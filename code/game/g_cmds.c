@@ -219,6 +219,49 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 	return -1;
 }
 
+
+/*
+==================
+Cmd_RBounce_f
+==================
+*/
+void Cmd_RBounce_f( gentity_t *ent) {
+    char *msg;  // msg to player
+    
+    ent->flags ^= FL_ROCKETBOUNCE;
+
+    if (!(ent->flags & FL_ROCKETBOUNCE))
+        msg = "Rocket Bounce OFF\n";
+    else
+        msg = "Rocket Bounce ON\n";
+    trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg ));
+}
+
+
+/*
+================
+Cmd_Cloak_f
+================
+*/
+void Cmd_Cloak_f( gentity_t *ent) {
+    char *msg;  // msg to player
+    
+    ent->flags ^= FL_CLOAK;
+
+    if (!(ent->flags & FL_CLOAK)) {
+        msg = "Cloaking OFF\n";
+        ent->client->ps.powerups[PW_INVIS] = level.time;
+        // Remove the invisible powerup from the player
+    } else {
+        msg = "Cloaking ON\n";
+        ent->client->ps.powerups[PW_INVIS] = level.time + 1000000000;
+        // Gives the invisible powerup to the player
+    }
+
+    trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg ));
+}
+
+
 /*
 ==================
 Cmd_Give_f
@@ -1747,6 +1790,10 @@ void ClientCommand( int clientNum ) {
 		Cmd_GameCommand_f( ent );
 	else if (Q_stricmp (cmd, "setviewpos") == 0)
 		Cmd_SetViewpos_f( ent );
+    else if (Q_stricmp (cmd, "rbounce") == 0)
+        Cmd_RBounce_f( ent );
+    else if(Q_stricmp (cmd, "cloak") == 0)
+        Cmd_Cloak_f( ent );
 	else if (Q_stricmp (cmd, "stats") == 0)
 		Cmd_Stats_f( ent );
 	else

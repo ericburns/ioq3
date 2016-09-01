@@ -105,6 +105,11 @@ void TossClientItems( gentity_t *self ) {
 		Drop_Item( self, item, 0 );
 	}
 
+    if (self->flags & FL_CLOAK) {
+        // remove the invisible powerup if the player is cloaked
+        self->client->ps.powerups[PW_INVIS] = level.time;
+    }
+
 	// drop all the powerups if not in teamplay
 	if ( g_gametype.integer != GT_TEAM ) {
 		angle = 45;

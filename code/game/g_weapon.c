@@ -454,20 +454,30 @@ void weapon_railgun_fire (gentity_t *ent) {
 	int			unlinked;
 	int			passent;
 	gentity_t	*unlinkedEntities[MAX_RAIL_HITS];
+    vec3_t      tracefrom;      // Sum
 
 	damage = 100 * s_quadFactor;
 
 	VectorMA (muzzle, 8192, forward, end);
+    VectorCopy (muzzle, tracefrom);
 
 	// trace only against the solids, so the railgun will go through people
 	unlinked = 0;
 	hits = 0;
 	passent = ent->s.number;
 	do {
-		trap_Trace (&trace, muzzle, NULL, NULL, end, passent, MASK_SHOT );
+		trap_Trace (&trace, tracefrom, NULL, NULL, end, passent, MASK_SHOT );
 		if ( trace.entityNum >= ENTITYNUM_MAX_NORMAL ) {
-			break;
-		}
+		    // SUM break if we hit the sky
+            if (trace.surfaceFlags & SURF_SKY)
+                break;
+            // Hypo: break if we traversed length of vector tracefrom
+            if (trace.fraction == 1.0)
+                break;
+            // otherwise continue tracing through walls
+            VectorMA (trace.endpos, 1, forward, tracefrom);
+            continue;
+        }
 		traceEnt = &g_entities[ trace.entityNum ];
 		if ( traceEnt->takedamage ) {
 #ifdef MISSIONPACK
@@ -541,6 +551,8 @@ void weapon_railgun_fire (gentity_t *ent) {
 		tent->s.eventParm = DirToByte( trace.plane.normal );
 	}
 	tent->s.clientNum = ent->s.clientNum;
+    // send the effect to everyone since it tunnels through walls
+    tent->r.svFlags |= SVF_BROADCAST;
 
 	// give the shooter a reward sound if they have made two railgun hits in a row
 	if ( hits == 0 ) {

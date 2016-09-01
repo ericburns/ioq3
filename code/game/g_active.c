@@ -445,10 +445,19 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			}
 #endif
 		} else {
-			// count down health when over max
-			if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] ) {
-				ent->health--;
-			}
+            if (!(ent->flags & FL_CLOAK)) {
+                // count down health when over max and not cloaked
+                if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] ) {
+                    ent->health--;
+                }
+            } else {
+                // count down health when cloaked
+                ent->health--;
+                if ( ent->health < 11 ) {
+                    ent->flags ^= FL_CLOAK;
+                    ent->client->ps.powerups[PW_INVIS] = level.time;
+                }
+            }
 		}
 
 		// count down armor when over max
@@ -837,7 +846,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	else
 #endif
-	if ( client->ps.powerups[PW_HASTE] ) {
+	if ( qtrue ) {
 		client->ps.speed *= 1.3;
 	}
 
