@@ -261,6 +261,8 @@ CG_TouchItem
 static void CG_TouchItem( centity_t *cent ) {
 	gitem_t		*item;
 
+    return;
+
 	if ( !cg_predictItems.integer ) {
 		return;
 	}

@@ -427,6 +427,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
 	qboolean	predict;
 
+    return;
+
 	if (!other->client)
 		return;
 	if (other->health < 1)
@@ -886,25 +888,30 @@ be on an entity that hasn't spawned yet.
 ============
 */
 void G_SpawnItem (gentity_t *ent, gitem_t *item) {
-	G_SpawnFloat( "random", "0", &ent->random );
-	G_SpawnFloat( "wait", "0", &ent->wait );
+    if (item->giType != IT_TEAM) {
+        G_SpawnFloat( "random", "0", &ent->random );
+        G_SpawnFloat( "wait", "0", &ent->wait );
 
-	RegisterItem( item );
-	if ( G_ItemDisabled(item) )
-		return;
+        // RegisterItem( item );
+        ent->item = BG_FindItemForWeapon( WP_MACHINEGUN );
+        if ( G_ItemDisabled(item) )
+            return;
 
-	ent->item = item;
-	// some movers spawn on the second frame, so delay item
-	// spawns until the third frame so they can ride trains
-	ent->nextthink = level.time + FRAMETIME * 2;
-	ent->think = FinishSpawningItem;
+        // ent->item = item;
+        // some movers spawn on the second frame, so delay item
+        // spawns until the third frame so they can ride trains
+        ent->nextthink = level.time + FRAMETIME * 2;
+        ent->think = FinishSpawningItem;
 
-	ent->physicsBounce = 0.50;		// items are bouncy
+        ent->physicsBounce = 0.50;		// items are bouncy
 
-	if ( item->giType == IT_POWERUP ) {
-		G_SoundIndex( "sound/items/poweruprespawn.wav" );
-		G_SpawnFloat( "noglobalsound", "0", &ent->speed);
-	}
+        ent->s.eFlags |= EF_NODRAW;
+
+        if ( item->giType == IT_POWERUP ) {
+            G_SoundIndex( "sound/items/poweruprespawn.wav" );
+            G_SpawnFloat( "noglobalsound", "0", &ent->speed);
+        }
+    }
 
 #ifdef MISSIONPACK
 	if ( item->giType == IT_PERSISTANT_POWERUP ) {
